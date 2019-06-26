@@ -1,8 +1,6 @@
 # coding = utf-8
 # author = huy4ng
 # power by python 3.7
-# PortScan: masscan -p 1-65535 -iL ip.txt -oX out.xml --rate=2000
-# 端口扫描默认使用masscan ，rate设置为2000，可靠性最好，从文件读取ip，输出为xml格式，方便解析
 import threading
 import queue
 import requests
