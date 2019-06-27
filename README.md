@@ -8,9 +8,9 @@ To deal a large number of ports fastly and detect the http service
 
 2.处理输出的xml文件，取出其中的ip和端口进行http和https的探测，并且针对不同的状态码进行分类，输出到对应的文件中。
 
-使用方式：
-从文本导入ip：
-python FastDealPorts.py -i ips.txt -o ports.xml -t 10 
+使用方式：\n
+从文本导入ip：\n
+python FastDealPorts.py -i ips.txt -o ports.xml -t 10 \n
 
-直接输入IP段：
+直接输入IP段：\n
 python FastDealPorts.py -p 192.168.1.1/16 -o ports.xml -t 10
