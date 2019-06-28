@@ -8,6 +8,8 @@ import xml.dom.minidom
 import argparse
 import sys
 import subprocess
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 taskqueue = queue.Queue()
 class RequestThread(threading.Thread):
@@ -61,22 +63,33 @@ class RequestThread(threading.Thread):
 
 
 def dealXMl(filename):
-    dom = xml.dom.minidom.parse(filename)
+    file = filename
+    dom = xml.dom.minidom.parse(file)
     root = dom.documentElement
-    items = root.getElementByTagName("addr")
-    ports = root.getElementByTagName("port")
-    for i in range(len(items)):
-        ip = items[i].getAttribute("address")
-        port = ports[i].getAttribute("portid")
-        creatTaskQueue(ip, port)
+    hosts = root.getElementsByTagName('host')
+    print(len(hosts))
+    with open("url.txt", "w+") as file:
+        for host in hosts:
+            # print(host.getAttribute("starttime"))
+            addresses = host.getElementsByTagName('address')
+            for ip in addresses:
+                # print(ip.getAttribute('addr'))
+                ports = host.getElementsByTagName('port')
+                for port in ports:
+                    # print(port.getAttribute('portid'))
+                    state = port.getElementsByTagName('state')
+                    if state[0].getAttribute('state') == 'open':
+                        url = "{}:{}".format(ip.getAttribute('addr'), port.getAttribute('portid'))
+                        # print(url)
+                        creatTaskQueue(url)
+                        file.write("http://"+ url +"\n")
+                        file.write("https://"+ url +"\n")
 
-def creatTaskQueue(ip, port):
-    url = ip + ":" + port
-    creatTaskQueue(url)
+def creatTaskQueue(url):
     taskqueue.put(url)
 
 def usage():
-    parser = argparse.ArgumentParser(usage="python {} -i <ip.txt> -t <threads>".format(sys.argv[1]),
+    parser = argparse.ArgumentParser(usage="python {} -i <ip.txt> -t <threads>".format(sys.argv[0]),
                                   description="Fastly to deal ports")
     parser.add_argument('--input', '-i', help="the file of ip list")
     parser.add_argument('--threads', '-t', default=5, help="the number of threads")
